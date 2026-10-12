@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 
 import 'core/theme/app_theme.dart';
 import 'features/splash/presentation/screens/splash_screen.dart';
+import 'features/detail_paket/presentation/screens/detail_pesanan_page.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -359,12 +360,10 @@ void _showCateringDetail(
                 child: ElevatedButton(
                   onPressed: () {
                     Navigator.pop(sheetContext);
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text(
-                          'Detail paket berhasil dibuka. '
-                          'Fitur pemesanan belum terhubung.',
-                        ),
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const DetailPesananPage(),
                       ),
                     );
                   },
