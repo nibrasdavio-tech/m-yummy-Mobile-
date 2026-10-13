@@ -1,121 +1,388 @@
+
 import 'package:flutter/material.dart';
+import 'package:device_preview/device_preview.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(
+    DevicePreview(
+      enabled: true,
+      builder: (context) => const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // TRY THIS: Try running your application with "flutter run". You'll see
-        // the application has a purple toolbar. Then, without quitting the app,
-        // try changing the seedColor in the colorScheme below to Colors.green
-        // and then invoke "hot reload" (save your changes or press the "hot
-        // reload" button in a Flutter-supported IDE, or press "r" if you used
-        // the command line to start the app).
-        //
-        // Notice that the counter didn't reset back to zero; the application
-        // state is not lost during the reload. To reset the state, use hot
-        // restart instead.
-        //
-        // This works for code too, not just values: Most code changes can be
-        // tested with just a hot reload.
-        colorScheme: .fromSeed(seedColor: Colors.deepPurple),
-      ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      debugShowCheckedModeBanner: false,
+      useInheritedMediaQuery: true,
+      locale: DevicePreview.locale(context),
+      builder: DevicePreview.appBuilder,
+      home: const RingkasanPesanan(),
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
+const biru = Color(0xFF2055D6);
+const navy = Color.fromARGB(255, 2, 50, 155);
+const latar = Color(0xFFF0F4FF);
 
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
+const int hargaPaket = 250000;
+const int penyesuaianMenu = 176000;
+const int hargaTambahan = 25000;
 
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
-
-  final String title;
-
-  @override
-  State<MyHomePage> createState() => _MyHomePageState();
+String rupiah(int angka) {
+  return 'Rp${angka.toString().replaceAllMapped(
+    RegExp(r'(\d)(?=(\d{3})+(?!\d))'),
+    (m) => '${m[1]}.',
+  )}';
 }
 
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
+class RingkasanPesanan extends StatelessWidget {
+  const RingkasanPesanan({super.key});
 
-  void _incrementCounter() {
-    setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
-    });
+  Widget judul(String teks) => Padding(
+        padding: const EdgeInsets.only(bottom: 12),
+        child: Text(
+          teks,
+          style: const TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+            color: navy,
+          ),
+        ),
+      );
+
+  Widget kartu({
+    required Widget isi,
+    Color warna = Colors.white,
+  }) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(16),
+      margin: const EdgeInsets.only(bottom: 18),
+      decoration: BoxDecoration(
+        color: warna,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: const Color(0xFFE1E8F7)),
+      ),
+      child: isi,
+    );
+  }
+
+  Widget barisMenu(String hari, String menu) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 10),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(
+            width: 60,
+            child: Text(
+              hari,
+              style: const TextStyle(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+          const Text('•  '),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(menu),
+                const SizedBox(height: 5),
+                const Text(
+                  '2 porsi • 11.30',
+                  style: TextStyle(
+                    color: Colors.grey,
+                    fontSize: 12,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const Text(
+            'Rp50.000',
+            style: TextStyle(
+              color: biru,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget biaya(String nama, int harga) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 6),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            nama,
+            style: const TextStyle(color: Colors.blueGrey),
+          ),
+          Text(
+            rupiah(harga),
+            style: const TextStyle(color: biru),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
+    final int totalHarga =
+        hargaPaket + penyesuaianMenu + hargaTambahan;
+
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
-        // TRY THIS: Try changing the color here to a specific color (to
-        // Colors.amber, perhaps?) and trigger a hot reload to see the AppBar
-        // change color while the other colors stay the same.
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: Text(widget.title),
-      ),
-      body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
-        child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
-          //
-          // TRY THIS: Invoke "debug painting" (choose the "Toggle Debug Paint"
-          // action in the IDE, or press "p" in the console), to see the
-          // wireframe for each widget.
-          mainAxisAlignment: .center,
-          children: [
-            const Text('You have pushed the button this many times:'),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headlineMedium,
-            ),
-          ],
+        backgroundColor: Colors.white,
+        foregroundColor: navy,
+        elevation: 0,
+        leading: const Icon(Icons.arrow_back, color: biru),
+        title: const Text(
+          'Ringkasan Pesanan',
+          style: TextStyle(fontWeight: FontWeight.bold),
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            judul('Paket Dipilih'),
+
+            kartu(
+              warna: latar,
+              isi: Row(
+                children: [
+                  Container(
+                    width: 90,
+                    height: 115,
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFDCE8D5),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(12),
+                      child: Image.asset(
+                        'assets/images/paket_mingguan.jpg',
+                        width: 90,
+                        height: 115,
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  const Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Paket Mingguan',
+                          style: TextStyle(
+                            fontSize: 17,
+                            fontWeight: FontWeight.bold,
+                            color: navy,
+                          ),
+                        ),
+                        SizedBox(height: 8),
+                        Text(
+                          'Senin, 06 Okt – Jumat, 10 Okt',
+                          style: TextStyle(
+                            color: Colors.blueGrey,
+                            fontSize: 12,
+                          ),
+                        ),
+                        SizedBox(height: 6),
+                        Text(
+                          '10 kali makan • 2 kali per hari',
+                          style: TextStyle(fontSize: 12),
+                        ),
+                        Divider(),
+                        Text(
+                          'Harga paket',
+                          style: TextStyle(color: Colors.grey),
+                        ),
+                        SizedBox(height: 4),
+                        Text(
+                          'Rp250.000',
+                          style: TextStyle(
+                            color: biru,
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            kartu(
+              isi: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  judul('Menu & Jadwal Pengantaran'),
+                  barisMenu('Senin', 'Ayam Teriyaki'),
+                  const Divider(height: 1),
+                  barisMenu('Selasa', 'Beef Teriyaki'),
+                  const Divider(height: 1),
+                  barisMenu('Rabu', 'Ayam Katsu'),
+                  const Divider(height: 1),
+                  barisMenu('Kamis', 'Ikan Balado'),
+                  const Divider(height: 1),
+                  barisMenu('Jumat', 'Ikan Asam Manis'),
+                ],
+              ),
+            ),
+
+            kartu(
+              isi: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  judul('Pesanan Tambahan'),
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: latar,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: const Row(
+                      children: [
+                        Icon(
+                          Icons.calendar_month,
+                          color: biru,
+                          size: 28,
+                        ),
+                        SizedBox(width: 12),
+                        Expanded(
+                          child: Text(
+                            'Sabtu • Ayam Teriyaki (1 porsi)\n12.00',
+                            style: TextStyle(height: 1.6),
+                          ),
+                        ),
+                        Text(
+                          'Rp25.000',
+                          style: TextStyle(
+                            color: biru,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  const Text(
+                    'Jika tidak ada tambahan, bagian ini tidak ditampilkan.',
+                    style: TextStyle(
+                      color: Colors.grey,
+                      fontSize: 12,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            kartu(
+              warna: latar,
+              isi: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  judul('Rincian Biaya'),
+                  biaya('Harga paket', hargaPaket),
+                  biaya('Penyesuaian menu', penyesuaianMenu),
+                  biaya('Pesanan tambahan', hargaTambahan),
+                  const Divider(height: 24),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text(
+                        'Total Harga',
+                        style: TextStyle(
+                          color: navy,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 18,
+                        ),
+                      ),
+                      Text(
+                        rupiah(totalHarga),
+                        style: const TextStyle(
+                          color: biru,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 19,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+
+            // Tombol pembayaran
+            SizedBox(
+              width: double.infinity,
+              height: 60,
+              child: ElevatedButton(
+                onPressed: () {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text(
+                        'Pesanan siap dilanjutkan ke pembayaran',
+                      ),
+                    ),
+                  );
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF204FE0),
+                  foregroundColor: Colors.white,
+                  elevation: 0,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(18),
+                  ),
+                ),
+                child: const Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      'Lanjut ke Pembayaran',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    SizedBox(width: 12),
+                    Icon(Icons.arrow_forward, size: 24),
+                  ],
+                ),
+              ),
+            ),
+
+            const SizedBox(height: 14),
+
+            const Center(
+              child: Text(
+                '🔒 Pesanan akan dikonfirmasi sebelum pembayaran',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: Colors.blueGrey,
+                  fontSize: 11,
+                ),
+              ),
+            ),
+
+            const SizedBox(height: 20),
+          ],
+        ),
       ),
     );
   }
