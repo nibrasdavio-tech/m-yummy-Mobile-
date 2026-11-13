@@ -1,6 +1,7 @@
-
 import 'package:flutter/material.dart';
 import 'package:device_preview/device_preview.dart';
+import 'ringkasan_pesanan.dart';
+
 
 void main() {
   runApp(
@@ -386,4 +387,6 @@ class RingkasanPesanan extends StatelessWidget {
       ),
     );
   }
+=======
+>>>>>>> 29418a1 (Ringkasan & Pembayaran)
 }
