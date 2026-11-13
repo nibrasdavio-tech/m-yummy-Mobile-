@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../../chat/presentation/screens/chat_admin_screen.dart';
+
 const Color biru = Color(0xFF2864F0);
 const Color biruMuda = Color(0xFFF1F6FF);
 const Color teks = Color(0xFF172B4D);
@@ -87,7 +89,7 @@ class _DetailPesananPageState extends State<DetailPesananPage> {
               child: Row(
                 children: [
                   IconButton(
-                    onPressed: () {},
+                    onPressed: () => Navigator.maybePop(context),
                     icon: const Icon(
                       Icons.arrow_back,
                       color: teks,
@@ -99,6 +101,22 @@ class _DetailPesananPageState extends State<DetailPesananPage> {
                       fontSize: 21,
                       fontWeight: FontWeight.bold,
                       color: teks,
+                    ),
+                  ),
+                  const Spacer(),
+                  IconButton(
+                    tooltip: 'Chat dengan Admin',
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const ChatAdminScreen(),
+                        ),
+                      );
+                    },
+                    icon: const Icon(
+                      Icons.chat_outlined,
+                      color: biru,
                     ),
                   ),
                 ],

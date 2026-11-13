@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'core/theme/app_theme.dart';
 import 'features/splash/presentation/screens/splash_screen.dart';
 import 'features/detail_paket/presentation/screens/detail_pesanan_page.dart';
+import 'features/chat/presentation/screens/chat_admin_screen.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -446,8 +447,24 @@ void _showCateringDetail(
           ),
         ),
         const Spacer(),
-        const SizedBox(width: 12),
         IconButton(
+          tooltip: 'Chat dengan Admin',
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => const ChatAdminScreen(),
+              ),
+            );
+          },
+          icon: const Icon(
+            Icons.chat_outlined,
+            color: primaryBlue,
+            size: 25,
+          ),
+        ),
+        IconButton(
+          tooltip: 'Notifikasi',
           onPressed: () {
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
@@ -886,6 +903,16 @@ Widget _buildProfilePage() {
             () => _showProfileDialog(
               'Notifikasi',
               'Pengaturan notifikasi myummy.',
+            ),
+          ),
+          _profileMenuItem(
+            Icons.chat_outlined,
+            'Chat dengan Admin',
+            () => Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => const ChatAdminScreen(),
+              ),
             ),
           ),
           _profileMenuItem(
