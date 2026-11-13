@@ -1,7 +1,29 @@
-
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+
+import 'core/theme/app_theme.dart';
+import 'features/splash/presentation/screens/splash_screen.dart';
+import 'features/detail_paket/presentation/screens/detail_pesanan_page.dart';
+import 'features/chat/presentation/screens/chat_admin_screen.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  // Mengunci orientasi ke portrait untuk konsistensi layout mobile
+  SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+    DeviceOrientation.portraitDown,
+  ]);
+
+  // Status bar transparan agar visual layar penuh bersih
+  SystemChrome.setSystemUIOverlayStyle(
+    const SystemUiOverlayStyle(
+      statusBarColor: Colors.transparent,
+      statusBarIconBrightness: Brightness.dark,
+      statusBarBrightness: Brightness.light,
+    ),
+  );
+
   runApp(const MyummyApp());
 }
 
@@ -17,15 +39,8 @@ class MyummyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'myummy',
-      theme: ThemeData(
-        useMaterial3: true,
-        scaffoldBackgroundColor: backgroundColor,
-        fontFamily: 'Roboto',
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: primaryBlue,
-        ),
-      ),
-      home: const HomePage(),
+      theme: AppTheme.lightTheme,
+      home: const SplashScreen(),
     );
   }
 }
@@ -346,12 +361,10 @@ void _showCateringDetail(
                 child: ElevatedButton(
                   onPressed: () {
                     Navigator.pop(sheetContext);
-                    ScaffoldMessenger.of(this.context).showSnackBar(
-                      const SnackBar(
-                        content: Text(
-                          'Detail paket berhasil dibuka. '
-                          'Fitur pemesanan belum terhubung.',
-                        ),
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const DetailPesananPage(),
                       ),
                     );
                   },
@@ -434,8 +447,24 @@ void _showCateringDetail(
           ),
         ),
         const Spacer(),
-        const SizedBox(width: 12),
         IconButton(
+          tooltip: 'Chat dengan Admin',
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => const ChatAdminScreen(),
+              ),
+            );
+          },
+          icon: const Icon(
+            Icons.chat_outlined,
+            color: primaryBlue,
+            size: 25,
+          ),
+        ),
+        IconButton(
+          tooltip: 'Notifikasi',
           onPressed: () {
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
@@ -874,6 +903,16 @@ Widget _buildProfilePage() {
             () => _showProfileDialog(
               'Notifikasi',
               'Pengaturan notifikasi myummy.',
+            ),
+          ),
+          _profileMenuItem(
+            Icons.chat_outlined,
+            'Chat dengan Admin',
+            () => Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => const ChatAdminScreen(),
+              ),
             ),
           ),
           _profileMenuItem(
