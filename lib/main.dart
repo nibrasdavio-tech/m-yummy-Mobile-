@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:device_preview/device_preview.dart';
 import 'ringkasan_pesanan.dart';
+import 'pembayaran.dart';
 
 
 void main() {
@@ -330,19 +331,18 @@ class RingkasanPesanan extends StatelessWidget {
             ),
 
             // Tombol pembayaran
-            SizedBox(
-              width: double.infinity,
-              height: 60,
-              child: ElevatedButton(
-                onPressed: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text(
-                        'Pesanan siap dilanjutkan ke pembayaran',
-                      ),
-                    ),
-                  );
-                },
+SizedBox(
+  width: double.infinity,
+  height: 60,
+  child: ElevatedButton(
+    onPressed: () {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const Pembayaran(),
+        ),
+      );
+    },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF204FE0),
                   foregroundColor: Colors.white,
@@ -387,6 +387,4 @@ class RingkasanPesanan extends StatelessWidget {
       ),
     );
   }
-=======
->>>>>>> 29418a1 (Ringkasan & Pembayaran)
 }

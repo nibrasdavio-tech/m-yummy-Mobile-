@@ -1,9 +1,6 @@
-PS C:\KAMPUS\SEMESTER 5\KODE PRAKTIKUM SIS\ringkasan_pesanan> Get-Content kamu_pubspec.txt
 
-name: ringkasan_pesanan
-
+name: m_yummy
 description: "A new Flutter project."
-
 publish_to: 'none'
 
 version: 1.0.0+1
@@ -29,4 +26,3 @@ flutter:
 
   assets:
     - assets/images/
-PS C:\KAMPUS\SEMESTER 5\KODE PRAKTIKUM SIS\ringkasan_pesanan> 
