@@ -1,25 +1,36 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:m_yummy/main.dart';
+import 'package:home/main.dart';
 
 void main() {
-  testWidgets('Counter increments smoke test',
+  testWidgets('App should render full-screen SplashScreen on startup',
       (WidgetTester tester) async {
     // Build our app and trigger a frame.
-    await tester.pumpWidget(const MyApp());
+    await tester.pumpWidget(const MyummyApp());
 
-    // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
+    // Verify that the full screen image is displayed.
+    expect(find.byType(Image), findsOneWidget);
+  });
 
-    // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.add));
-    await tester.pump();
+  testWidgets(
+      'HomePage displays chat icon next to notification icon and navigates to ChatAdminScreen',
+      (WidgetTester tester) async {
+    await tester.pumpWidget(
+      const MaterialApp(
+        home: HomePage(),
+      ),
+    );
 
-    // Verify that our counter has incremented.
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
+    // Verify both icons exist in the dashboard
+    expect(find.byIcon(Icons.chat_outlined), findsWidgets);
+    expect(find.byIcon(Icons.notifications_active), findsOneWidget);
+
+    // Tap chat icon in header
+    await tester.tap(find.byIcon(Icons.chat_outlined).first);
+    await tester.pumpAndSettle();
+
+    // Verify ChatAdminScreen is opened
+    expect(find.text('Chat dengan Admin'), findsOneWidget);
   });
 }

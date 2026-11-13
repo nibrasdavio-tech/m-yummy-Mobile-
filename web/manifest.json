@@ -1,6 +1,6 @@
 {
-    "name": "m_yummy",
-    "short_name": "m_yummy",
+    "name": "home",
+    "short_name": "home",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
