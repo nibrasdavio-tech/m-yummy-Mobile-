@@ -1,3 +1,4 @@
+
 import 'package:flutter/material.dart';
 import 'jadwal_pengantaran_page.dart';
 
@@ -37,6 +38,7 @@ class _PesanPaketPageState extends State<PesanPaketPage> {
           style: const TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.bold,
+            color: Color(0xFF6F7787),
           ),
         ),
         const SizedBox(height: 10),
@@ -46,16 +48,27 @@ class _PesanPaketPageState extends State<PesanPaketPage> {
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: Colors.grey.shade300),
+            border: Border.all(
+              color: Colors.grey.shade300,
+            ),
           ),
           child: DropdownButtonHideUnderline(
             child: DropdownButton<String>(
               value: value,
               isExpanded: true,
+              style: const TextStyle(
+                color: Colors.black87,
+                fontSize: 16,
+              ),
               items: pilihan.map((waktu) {
                 return DropdownMenuItem<String>(
                   value: waktu,
-                  child: Text(waktu),
+                  child: Text(
+                    waktu,
+                    style: const TextStyle(
+                      color: Colors.black87,
+                    ),
+                  ),
                 );
               }).toList(),
               onChanged: onChanged,
@@ -70,7 +83,9 @@ class _PesanPaketPageState extends State<PesanPaketPage> {
     if (alamatController.text.trim().isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Alamat pengantaran harus diisi'),
+          content: Text(
+            'Alamat pengantaran harus diisi',
+          ),
         ),
       );
       return;
@@ -92,15 +107,19 @@ class _PesanPaketPageState extends State<PesanPaketPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFF8F8FC),
+
       appBar: AppBar(
         backgroundColor: blue,
         foregroundColor: Colors.white,
         title: const Text(
           'Pesan Paket',
-          style: TextStyle(fontWeight: FontWeight.bold),
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+          ),
         ),
         centerTitle: true,
       ),
+
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
         child: Column(
@@ -111,9 +130,12 @@ class _PesanPaketPageState extends State<PesanPaketPage> {
               style: TextStyle(
                 fontSize: 22,
                 fontWeight: FontWeight.bold,
+                color: Color(0xFF6F7787),
               ),
             ),
+
             const SizedBox(height: 8),
+
             Text(
               'Pilih waktu pengantaran untuk setiap jadwal makan.',
               style: TextStyle(
@@ -167,28 +189,60 @@ class _PesanPaketPageState extends State<PesanPaketPage> {
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
+                color: Color(0xFF6F7787),
               ),
             ),
+
             const SizedBox(height: 10),
 
+            // INPUT ALAMAT PENGANTARAN
             TextField(
               controller: alamatController,
               maxLines: 3,
+
+              // PERBAIKAN WARNA TEKS
+              style: const TextStyle(
+                color: Colors.black87,
+                fontSize: 14,
+                fontWeight: FontWeight.normal,
+              ),
+
+              cursorColor: blue,
+              keyboardType: TextInputType.streetAddress,
+              textCapitalization: TextCapitalization.sentences,
+
               decoration: InputDecoration(
                 hintText: 'Masukkan alamat lengkap...',
+                hintStyle: const TextStyle(
+                  color: Colors.grey,
+                  fontSize: 14,
+                ),
+
                 filled: true,
                 fillColor: Colors.white,
-                contentPadding: const EdgeInsets.all(14),
+
+                contentPadding: const EdgeInsets.all(16),
+
                 border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(
-                    color: Colors.grey.shade300,
+                  borderRadius: BorderRadius.circular(30),
+                  borderSide: const BorderSide(
+                    color: blue,
                   ),
                 ),
+
                 enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(
-                    color: Colors.grey.shade300,
+                  borderRadius: BorderRadius.circular(30),
+                  borderSide: const BorderSide(
+                    color: blue,
+                    width: 1.5,
+                  ),
+                ),
+
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(30),
+                  borderSide: const BorderSide(
+                    color: blue,
+                    width: 2,
                   ),
                 ),
               ),

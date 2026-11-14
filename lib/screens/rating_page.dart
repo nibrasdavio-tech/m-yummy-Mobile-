@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 
 const Color ratingBlue = Color(0xFF1748D8);
@@ -24,9 +23,7 @@ class _RatingPageState extends State<RatingPage> {
   final Set<String> selectedCategories = {};
 
   final TextEditingController reviewController =
-      TextEditingController(
-    text: 'Makanannya enak, pengantarannya tepat waktu. Terima kasih!',
-  );
+      TextEditingController();
 
   @override
   void dispose() {
@@ -65,6 +62,7 @@ class _RatingPageState extends State<RatingPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              // HEADER
               Row(
                 children: [
                   IconButton(
@@ -79,6 +77,7 @@ class _RatingPageState extends State<RatingPage> {
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
+                      color: Color(0xFF6F7787),
                     ),
                   ),
                 ],
@@ -87,6 +86,7 @@ class _RatingPageState extends State<RatingPage> {
               const SizedBox(height: 15),
               Divider(color: Colors.grey.shade300),
 
+              // INFORMASI PAKET
               Row(
                 children: [
                   Container(
@@ -102,7 +102,9 @@ class _RatingPageState extends State<RatingPage> {
                       size: 35,
                     ),
                   ),
+
                   const SizedBox(width: 12),
+
                   const Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -112,16 +114,21 @@ class _RatingPageState extends State<RatingPage> {
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 13,
+                            color: Color(0xFF6F7787),
                           ),
                         ),
                         SizedBox(height: 4),
                         Text(
                           '1 Okt - 5 Okt 2026',
-                          style: TextStyle(fontSize: 11),
+                          style: TextStyle(
+                            fontSize: 11,
+                            color: Color(0xFF6F7787),
+                          ),
                         ),
                       ],
                     ),
                   ),
+
                   Container(
                     padding: const EdgeInsets.symmetric(
                       horizontal: 12,
@@ -145,11 +152,13 @@ class _RatingPageState extends State<RatingPage> {
               const SizedBox(height: 18),
               Divider(color: Colors.grey.shade300),
 
+              // RATING BINTANG
               const Text(
                 'Beri Rating',
                 style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.bold,
+                  color: Color(0xFF6F7787),
                 ),
               ),
 
@@ -164,17 +173,21 @@ class _RatingPageState extends State<RatingPage> {
                     style: const TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 15,
+                      color: Color(0xFF6F7787),
                     ),
                   ),
                 ],
               ),
 
               const SizedBox(height: 20),
+
+              // KATEGORI PENGALAMAN
               const Text(
                 'Bagaimana pengalamanmu?',
                 style: TextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.bold,
+                  color: Color(0xFF6F7787),
                 ),
               ),
 
@@ -226,6 +239,7 @@ class _RatingPageState extends State<RatingPage> {
               const SizedBox(height: 20),
               Divider(color: Colors.grey.shade300),
 
+              // INPUT ULASAN
               const Text(
                 'Tulis ulasan (opsional)',
                 style: TextStyle(
@@ -239,16 +253,35 @@ class _RatingPageState extends State<RatingPage> {
               TextField(
                 controller: reviewController,
                 maxLines: 4,
+
+                // PERBAIKAN WARNA TEKS YANG DIKETIK
+                style: const TextStyle(
+                  color: Colors.black87,
+                  fontSize: 13,
+                  fontWeight: FontWeight.normal,
+                ),
+
+                cursorColor: ratingBlue,
+                keyboardType: TextInputType.multiline,
+                textCapitalization: TextCapitalization.sentences,
+
                 decoration: InputDecoration(
                   hintText: 'Ceritakan pengalamanmu...',
-                  hintStyle: const TextStyle(fontSize: 12),
+                  hintStyle: const TextStyle(
+                    fontSize: 12,
+                    color: Colors.grey,
+                  ),
+                  filled: true,
+                  fillColor: Colors.white,
                   contentPadding: const EdgeInsets.all(14),
+
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                     borderSide: const BorderSide(
                       color: ratingBlue,
                     ),
                   ),
+
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                     borderSide: const BorderSide(
@@ -257,18 +290,16 @@ class _RatingPageState extends State<RatingPage> {
                     ),
                   ),
                 ),
-                style: const TextStyle(fontSize: 12),
               ),
 
               const SizedBox(height: 14),
 
+              // TOMBOL KIRIM ULASAN
               SizedBox(
                 width: double.infinity,
                 height: 48,
                 child: ElevatedButton(
                   onPressed: () {
-                    if (selectedRating == 0) return;
-
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
                         content: Text(

@@ -1,10 +1,24 @@
-import 'package:flutter/material.dart';
-import 'dart:io';
-import 'package:image_picker/image_picker.dart';
+
 import 'dart:typed_data';
 
+import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
+
+import 'pesanan_data.dart';
+
 class Pembayaran extends StatefulWidget {
-  const Pembayaran({super.key});
+  final int totalPembayaran;
+  final String hariPengantaran;
+  final String waktuPengantaran;
+  final List<Map<String, dynamic>> menuTambahan;
+
+  const Pembayaran({
+    super.key,
+    this.totalPembayaran = 250000,
+    this.hariPengantaran = '',
+    this.waktuPengantaran = '',
+    this.menuTambahan = const [],
+  });
 
   @override
   State<Pembayaran> createState() => _PembayaranState();
@@ -15,25 +29,99 @@ class _PembayaranState extends State<Pembayaran> {
 
   String metodeDipilih = 'Transfer Bank';
 
-  // Menyimpan gambar bukti pembayaran
   Uint8List? buktiPembayaran;
 
-  // Fungsi memilih gambar dari galeri
+  bool sedangMemproses = false;
+
+  // Memilih gambar bukti pembayaran dari galeri
   Future<void> pilihGambar() async {
-  final ImagePicker picker = ImagePicker();
+    try {
+      final ImagePicker picker = ImagePicker();
 
-  final XFile? gambar = await picker.pickImage(
-    source: ImageSource.gallery,
-  );
+      final XFile? gambar = await picker.pickImage(
+        source: ImageSource.gallery,
+      );
 
-  if (gambar != null) {
-    final bytes = await gambar.readAsBytes();
+      if (gambar != null) {
+        final bytes = await gambar.readAsBytes();
+
+        if (!mounted) return;
+
+        setState(() {
+          buktiPembayaran = bytes;
+        });
+      }
+    } catch (e) {
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'Gagal memilih gambar. Silakan coba kembali.',
+          ),
+        ),
+      );
+    }
+  }
+
+  // Format nominal menjadi Rupiah
+  String formatRupiah(int nominal) {
+    return 'Rp ${nominal.toString().replaceAllMapped(
+      RegExp(r'\B(?=(\d{3})+(?!\d))'),
+      (match) => '.',
+    )}';
+  }
+
+  // Konfirmasi pembayaran dan menyimpan data pesanan
+  void konfirmasiPembayaran() {
+    if (sedangMemproses) return;
+
+    if (buktiPembayaran == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'Silakan unggah bukti pembayaran terlebih dahulu.',
+          ),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
 
     setState(() {
-      buktiPembayaran = bytes;
+      sedangMemproses = true;
     });
+
+    try {
+      // Menyimpan informasi pesanan
+      PesananData.simpanPesanan(
+        nama: 'Paket Mingguan',
+        hari: widget.hariPengantaran,
+        waktu: widget.waktuPengantaran,
+        tambahan: widget.menuTambahan,
+        total: widget.totalPembayaran,
+      );
+
+      // Kembali ke Home dan membuka tab Pesanan
+      Navigator.pushNamedAndRemoveUntil(
+        context,
+        '/home-pesanan',
+        (route) => false,
+      );
+    } catch (e) {
+      setState(() {
+        sedangMemproses = false;
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'Gagal menyimpan pesanan: $e',
+          ),
+        ),
+      );
+    }
   }
-}
 
   @override
   Widget build(BuildContext context) {
@@ -143,10 +231,10 @@ class _PembayaranState extends State<Pembayaran> {
 
                   // Kotak upload bukti pembayaran
                   InkWell(
-                    onTap: pilihGambar,
+                    onTap: sedangMemproses ? null : pilihGambar,
                     child: Container(
                       width: double.infinity,
-                      height: 120,
+                      height: 150,
                       decoration: BoxDecoration(
                         color: Colors.white,
                         border: Border.all(
@@ -179,16 +267,52 @@ class _PembayaranState extends State<Pembayaran> {
                           : ClipRRect(
                               borderRadius:
                                   BorderRadius.circular(11),
-                              child: 
-                              Image.memory(
+                              child: Image.memory(
                                 buktiPembayaran!,
                                 width: double.infinity,
-                                height: 120,
-                                fit: BoxFit.cover,
+                                height: 150,
+                                fit: BoxFit.contain,
                               ),
                             ),
                     ),
                   ),
+
+                  if (buktiPembayaran != null) ...[
+                    const SizedBox(height: 8),
+                    Row(
+                      children: [
+                        const Icon(
+                          Icons.check_circle,
+                          color: Colors.green,
+                          size: 16,
+                        ),
+                        const SizedBox(width: 6),
+                        const Expanded(
+                          child: Text(
+                            'Bukti pembayaran berhasil dipilih.',
+                            style: TextStyle(
+                              fontSize: 11,
+                              color: Colors.green,
+                            ),
+                          ),
+                        ),
+                        TextButton(
+                          onPressed: () {
+                            setState(() {
+                              buktiPembayaran = null;
+                            });
+                          },
+                          child: const Text(
+                            'Hapus',
+                            style: TextStyle(
+                              color: Colors.red,
+                              fontSize: 11,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
                 ],
               ),
             ),
@@ -212,9 +336,9 @@ class _PembayaranState extends State<Pembayaran> {
 
                   const SizedBox(height: 4),
 
-                  const Text(
-                    'Rp 451.000',
-                    style: TextStyle(
+                  Text(
+                    formatRupiah(widget.totalPembayaran),
+                    style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
                       color: biru,
@@ -234,30 +358,34 @@ class _PembayaranState extends State<Pembayaran> {
               width: double.infinity,
               height: 48,
               child: ElevatedButton(
-                onPressed: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text(
-                        'Konfirmasi pembayaran berhasil',
-                      ),
-                    ),
-                  );
-                },
+                onPressed: sedangMemproses
+                    ? null
+                    : konfirmasiPembayaran,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: biru,
                   foregroundColor: Colors.white,
+                  disabledBackgroundColor: Colors.grey,
                   elevation: 0,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
                 ),
-                child: const Text(
-                  'Konfirmasi Pembayaran',
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
+                child: sedangMemproses
+                    ? const SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(
+                          color: Colors.white,
+                          strokeWidth: 2,
+                        ),
+                      )
+                    : const Text(
+                        'Konfirmasi Pembayaran',
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
               ),
             ),
           ),
@@ -266,12 +394,14 @@ class _PembayaranState extends State<Pembayaran> {
     );
   }
 
-  // Widget untuk menampilkan pilihan pembayaran
+  // Widget pilihan metode pembayaran
   Widget pilihanPembayaran({
     required String nama,
     required String keterangan,
     required IconData ikon,
   }) {
+    final bool terpilih = metodeDipilih == nama;
+
     return InkWell(
       onTap: () {
         setState(() {
@@ -285,7 +415,9 @@ class _PembayaranState extends State<Pembayaran> {
         ),
         decoration: BoxDecoration(
           border: Border.all(
-            color: const Color(0xFFD5DCE8),
+            color: terpilih
+                ? biru
+                : const Color(0xFFD5DCE8),
           ),
           borderRadius: BorderRadius.circular(8),
         ),
@@ -326,9 +458,11 @@ class _PembayaranState extends State<Pembayaran> {
               groupValue: metodeDipilih,
               activeColor: biru,
               onChanged: (value) {
-                setState(() {
-                  metodeDipilih = value!;
-                });
+                if (value != null) {
+                  setState(() {
+                    metodeDipilih = value;
+                  });
+                }
               },
             ),
           ],

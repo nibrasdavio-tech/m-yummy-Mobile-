@@ -1,5 +1,6 @@
 
 import 'package:flutter/material.dart';
+import '../pembayaran.dart';
 
 class PesananTambahanPage extends StatefulWidget {
   const PesananTambahanPage({super.key});
@@ -11,6 +12,9 @@ class PesananTambahanPage extends StatefulWidget {
 
 class _PesananTambahanPageState extends State<PesananTambahanPage> {
   static const blue = Color(0xFF2449D8);
+
+  // Harga dasar paket mingguan
+  static const int hargaPaketMingguan = 250000;
 
   String hariAktif = 'Senin';
   String waktu = '10.00 - 13.00';
@@ -53,6 +57,7 @@ class _PesananTambahanPageState extends State<PesananTambahanPage> {
 
   final Map<String, int> tambahan = {};
 
+  // Menghitung total harga menu tambahan
   int get totalTambahan {
     int total = 0;
 
@@ -67,11 +72,35 @@ class _PesananTambahanPageState extends State<PesananTambahanPage> {
     return total;
   }
 
+  // Menghitung total pembayaran paket + menu tambahan
+  int get totalPembayaran {
+    return hargaPaketMingguan + totalTambahan;
+  }
+
   int get totalPorsi {
     return tambahan.values.fold(
       0,
       (sum, value) => sum + value,
     );
+  }
+
+  // Menyiapkan daftar menu tambahan untuk dikirim ke pembayaran
+  List<Map<String, dynamic>> get daftarTambahanTerpilih {
+    return menuTambahan
+        .where((item) {
+          final nama = item['nama'] as String;
+          return (tambahan[nama] ?? 0) > 0;
+        })
+        .map((item) {
+          final nama = item['nama'] as String;
+
+          return {
+            'nama': nama,
+            'harga': item['harga'],
+            'jumlah': tambahan[nama] ?? 0,
+          };
+        })
+        .toList();
   }
 
   String formatRupiah(int nominal) {
@@ -223,6 +252,7 @@ class _PesananTambahanPageState extends State<PesananTambahanPage> {
   }
 
   void konfirmasiPesanan() {
+    // Jika tidak memilih menu tambahan
     if (totalPorsi == 0) {
       showDialog(
         context: context,
@@ -238,6 +268,18 @@ class _PesananTambahanPageState extends State<PesananTambahanPage> {
               TextButton(
                 onPressed: () {
                   Navigator.pop(dialogContext);
+
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => Pembayaran(
+                        totalPembayaran: totalPembayaran,
+                        hariPengantaran: hariAktif,
+                        waktuPengantaran: waktu,
+                        menuTambahan: daftarTambahanTerpilih,
+                      ),
+                    ),
+                  );
                 },
                 child: const Text('OK'),
               ),
@@ -245,9 +287,11 @@ class _PesananTambahanPageState extends State<PesananTambahanPage> {
           );
         },
       );
+
       return;
     }
 
+    // Daftar nama menu yang dipilih
     final daftarPesanan = menuTambahan
         .where((item) {
           final nama = item['nama'] as String;
@@ -272,12 +316,25 @@ class _PesananTambahanPageState extends State<PesananTambahanPage> {
             'Menu tambahan:\n'
             '$daftarPesanan\n\n'
             'Total porsi: $totalPorsi\n'
-            'Total tambahan: ${formatRupiah(totalTambahan)}',
+            'Total tambahan: ${formatRupiah(totalTambahan)}\n\n'
+            'Total pembayaran: ${formatRupiah(totalPembayaran)}',
           ),
           actions: [
             TextButton(
               onPressed: () {
                 Navigator.pop(dialogContext);
+
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => Pembayaran(
+                      totalPembayaran: totalPembayaran,
+                      hariPengantaran: hariAktif,
+                      waktuPengantaran: waktu,
+                      menuTambahan: daftarTambahanTerpilih,
+                    ),
+                  ),
+                );
               },
               child: const Text('OK'),
             ),
@@ -430,7 +487,7 @@ class _PesananTambahanPageState extends State<PesananTambahanPage> {
 
                 const SizedBox(height: 18),
 
-                // TOTAL BIAYA
+                // TOTAL BIAYA TAMBAHAN
                 Container(
                   padding: const EdgeInsets.all(14),
                   decoration: BoxDecoration(

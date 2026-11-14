@@ -1,3 +1,4 @@
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'core/theme/app_theme.dart';
@@ -5,6 +6,8 @@ import 'features/splash/presentation/screens/splash_screen.dart';
 import 'features/detail_paket/presentation/screens/detail_pesanan_page.dart';
 import 'features/chat/presentation/screens/chat_admin_screen.dart';
 import 'paket/detail_paket_mingguan_page.dart';
+import 'screens/rating_page.dart';
+import 'pesanan_data.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -23,9 +26,7 @@ void main() {
 }
 
 const Color primaryBlue = Color(0xFF1748D8);
-
 const Color lightBlue = Color(0xFF7898D1);
-
 const Color backgroundColor = Color(0xFFF8F9FC);
 
 class MyummyApp extends StatelessWidget {
@@ -33,12 +34,16 @@ class MyummyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'myummy',
-      theme: AppTheme.lightTheme,
-      home: const SplashScreen(),
-    );
+return MaterialApp(
+  debugShowCheckedModeBanner: false,
+  title: 'myummy',
+  theme: AppTheme.lightTheme,
+  home: const SplashScreen(),
+  routes: {
+    '/home-pesanan': (context) =>
+        const HomePage(initialTab: 2),
+  },
+);
   }
 }
 
@@ -47,6 +52,7 @@ class FoodItem {
   final String price;
   final String rating;
   final String image;
+
   const FoodItem({
     required this.name,
     required this.price,
@@ -77,14 +83,26 @@ const List<FoodItem> bestSellers = [
 ];
 
 class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+  final int initialTab;
+
+  const HomePage({
+    super.key,
+    this.initialTab = 0,
+  });
 
   @override
   State<HomePage> createState() => _HomePageState();
 }
 
 class _HomePageState extends State<HomePage> {
-  int selectedIndex = 0;
+  late int selectedIndex;
+
+  @override
+  void initState() {
+    super.initState();
+    selectedIndex = widget.initialTab;
+  }
+
   final List<String> pageTitles = [
     'Home',
     'Paket',
@@ -124,18 +142,6 @@ class _HomePageState extends State<HomePage> {
               padding: const EdgeInsets.fromLTRB(20, 24, 20, 20),
               child: Column(
                 children: [
-                  Row(
-                    children: [
-                      Expanded(
-                        child: _packageTab('Mingguan'),
-                      ),
-                      const SizedBox(width: 10),
-                      Expanded(
-                        child: _packageTab('Bulanan'),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 20),
                   _packageCard(
                     title: 'Paket Mingguan',
                     subtitle: '10x makan (pilih menu)',
@@ -148,7 +154,7 @@ class _HomePageState extends State<HomePage> {
                   const SizedBox(height: 16),
                   _packageCard(
                     title: 'Paket Bulanan',
-                    subtitle: '20x makan (pilih menu)',
+                    subtitle: '40x makan (pilih menu)',
                     price: 'Rp 900.000',
                     image: 'assets/images/ikan_asam_manis.jpg',
                     description:
@@ -261,7 +267,8 @@ class _HomePageState extends State<HomePage> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (_) => const DetailPaketMingguanPage(),
+                            builder: (_) =>
+                                const DetailPaketMingguanPage(),
                           ),
                         );
                       } else {
@@ -378,29 +385,26 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      body: SafeArea(
-        child: IndexedStack(
-          index: selectedIndex,
-          children: [
-            _buildHome(),
-            _buildPackagePage(),
-            _buildSimplePage(
-              'Pesanan Saya',
-              'Pesanan makanan kamu akan tampil di sini.',
-              Icons.receipt_long_rounded,
-            ),
-            _buildProfilePage(),
-          ],
-        ),
+@override
+Widget build(BuildContext context) {
+  return Scaffold(
+    backgroundColor: Colors.white,
+    body: SafeArea(
+      child: IndexedStack(
+        index: selectedIndex,
+        children: [
+          _buildHome(),
+          _buildPackagePage(),
+          _buildPesananPage(),
+          _buildProfilePage(),
+        ],
       ),
-      bottomNavigationBar: _buildBottomNavigation(),
-    );
-  }
-    Widget _buildHome() {
+    ),
+    bottomNavigationBar: _buildBottomNavigation(),
+  );
+}
+
+  Widget _buildHome() {
     return SingleChildScrollView(
       padding: const EdgeInsets.fromLTRB(16, 12, 16, 20),
       child: Column(
@@ -753,6 +757,7 @@ class _HomePageState extends State<HomePage> {
       Icons.receipt_long_outlined,
       Icons.person_outline_rounded,
     ];
+
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
@@ -767,6 +772,7 @@ class _HomePageState extends State<HomePage> {
           child: Row(
             children: List.generate(4, (index) {
               final isSelected = selectedIndex == index;
+
               return Expanded(
                 child: InkWell(
                   onTap: () {
@@ -805,7 +811,276 @@ class _HomePageState extends State<HomePage> {
       ),
     );
   }
-    Widget _buildProfilePage() {
+
+Widget _buildPesananPage() {
+  if (!PesananData.adaPesanan) {
+    return _buildSimplePage(
+      'Pesanan Saya',
+      'Pesanan makanan kamu akan tampil di sini.',
+      Icons.receipt_long_rounded,
+    );
+  }
+
+  return SafeArea(
+    child: SingleChildScrollView(
+      padding: const EdgeInsets.all(20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'Pesanan Saya',
+            style: TextStyle(
+              fontSize: 22,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+
+          const SizedBox(height: 18),
+
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: const Color(0xFFE7ECFF),
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(
+                color: const Color(0xFFD2DCFF),
+              ),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // JUDUL PAKET
+                Row(
+                  children: [
+                    const CircleAvatar(
+                      backgroundColor: Colors.white,
+                      child: Icon(
+                        Icons.restaurant,
+                        color: primaryBlue,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Text(
+                        PesananData.namaPaket,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+
+                const Divider(height: 28),
+
+                // JADWAL PENGANTARAN
+                const Text(
+                  'Jadwal Pengantaran',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 12,
+                  ),
+                ),
+
+                const SizedBox(height: 12),
+
+                if (PesananData.jadwalPengantaran.isNotEmpty)
+                  ...PesananData.jadwalPengantaran.map((jadwal) {
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: 14),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            jadwal['hari'] ?? '-',
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 12,
+                            ),
+                          ),
+
+                          const SizedBox(height: 6),
+
+                          Row(
+                            children: [
+                              const Icon(
+                                Icons.circle,
+                                size: 7,
+                                color: Color(0xFF6486F5),
+                              ),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: Text(
+                                  'Makan 1: ${jadwal['makan1'] ?? '-'}',
+                                  style: const TextStyle(fontSize: 12),
+                                ),
+                              ),
+                            ],
+                          ),
+
+                          const SizedBox(height: 5),
+
+                          Row(
+                            children: [
+                              const Icon(
+                                Icons.circle,
+                                size: 7,
+                                color: Color(0xFF6486F5),
+                              ),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: Text(
+                                  'Makan 2: ${jadwal['makan2'] ?? '-'}',
+                                  style: const TextStyle(fontSize: 12),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    );
+                  })
+                else ...[
+                  Text(
+                    'Hari: ${PesananData.hariPengantaran.isNotEmpty ? PesananData.hariPengantaran : "-"}',
+                    style: const TextStyle(fontSize: 12),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    'Waktu: ${PesananData.waktuPengantaran.isNotEmpty ? PesananData.waktuPengantaran : "-"}',
+                    style: const TextStyle(fontSize: 12),
+                  ),
+                ],
+
+                const SizedBox(height: 8),
+
+                // MENU TAMBAHAN
+                const Text(
+                  'Menu Tambahan',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 12,
+                  ),
+                ),
+
+                const SizedBox(height: 8),
+
+                if (PesananData.menuTambahan.isEmpty)
+                  const Text(
+                    'Tidak ada menu tambahan.',
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: Colors.grey,
+                    ),
+                  )
+                else
+                  ...PesananData.menuTambahan.map((item) {
+                    final nama = item['nama'] ?? '';
+                    final jumlah = item['jumlah'] ?? 0;
+                    final harga = item['harga'] as int? ?? 0;
+
+                    final subtotal = harga * (jumlah as int);
+
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: 6),
+                      child: Row(
+                        mainAxisAlignment:
+                            MainAxisAlignment.spaceBetween,
+                        children: [
+                          Expanded(
+                            child: Text(
+                              '$nama ($jumlah porsi)',
+                              style: const TextStyle(fontSize: 12),
+                            ),
+                          ),
+                          Text(
+                            'Rp ${subtotal.toString().replaceAllMapped(
+                              RegExp(r'\B(?=(\d{3})+(?!\d))'),
+                              (match) => '.',
+                            )}',
+                            style: const TextStyle(fontSize: 12),
+                          ),
+                        ],
+                      ),
+                    );
+                  }),
+
+                const Divider(height: 24),
+
+                // TOTAL PEMBAYARAN
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text(
+                      'Total Pembayaran',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 13,
+                      ),
+                    ),
+                    Text(
+                      'Rp ${PesananData.totalPembayaran.toString().replaceAllMapped(
+                        RegExp(r'\B(?=(\d{3})+(?!\d))'),
+                        (match) => '.',
+                      )}',
+                      style: const TextStyle(
+                        color: primaryBlue,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 15,
+                      ),
+                    ),
+                  ],
+                ),
+
+                const SizedBox(height: 18),
+
+                // TOMBOL RATING DAN ULASAN
+                SizedBox(
+                  width: double.infinity,
+                  height: 45,
+                  child: OutlinedButton.icon(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const RatingPage(),
+                        ),
+                      );
+                    },
+                    icon: const Icon(
+                      Icons.star_outline,
+                      color: primaryBlue,
+                    ),
+                    label: const Text(
+                      'Rating & Ulasan',
+                      style: TextStyle(
+                        color: primaryBlue,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    style: OutlinedButton.styleFrom(
+                      side: const BorderSide(
+                        color: primaryBlue,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    ),
+  );
+}
+
+
+  Widget _buildProfilePage() {
     return SafeArea(
       child: SingleChildScrollView(
         padding: const EdgeInsets.fromLTRB(24, 12, 24, 24),
@@ -908,6 +1183,16 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
             _profileMenuItem(
+              Icons.star_outline,
+              'Rating & Ulasan',
+              () => Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => const RatingPage(),
+                ),
+              ),
+            ),
+            _profileMenuItem(
               Icons.info_outline,
               'Tentang Aplikasi',
               () => _showProfileDialog(
@@ -969,7 +1254,7 @@ class _HomePageState extends State<HomePage> {
                 ),
               ),
             ),
-            Icon(
+            const Icon(
               Icons.chevron_right,
               color: Colors.grey,
             ),
@@ -1065,7 +1350,8 @@ class _HomePageState extends State<HomePage> {
       ),
     );
   }
-    void _showFoodDetail(FoodItem food) {
+
+  void _showFoodDetail(FoodItem food) {
     showModalBottomSheet(
       context: context,
       showDragHandle: true,
@@ -1152,6 +1438,7 @@ class _HomePageState extends State<HomePage> {
       );
       return;
     }
+
     showDialog(
       context: context,
       builder: (context) => AlertDialog(

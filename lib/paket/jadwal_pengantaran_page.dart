@@ -1,6 +1,8 @@
+
 import 'package:flutter/material.dart';
 
 import 'pesanan_tambahan_page.dart';
+import '../pesanan_data.dart';
 
 class JadwalPengantaranPage extends StatelessWidget {
   final String makan1;
@@ -212,10 +214,22 @@ class JadwalPengantaranPage extends StatelessWidget {
               height: 44,
               child: ElevatedButton(
                 onPressed: () {
+                  // SIMPAN SELURUH JADWAL PAKET MINGGUAN
+                  PesananData.jadwalPengantaran =
+                      hariList.map((hari) {
+                    return <String, String>{
+                      'hari': hari,
+                      'makan1': makan1,
+                      'makan2': makan2,
+                    };
+                  }).toList();
+
+                  // LANJUT KE PESANAN TAMBAHAN
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (_) => const PesananTambahanPage(),
+                      builder: (_) =>
+                          const PesananTambahanPage(),
                     ),
                   );
                 },
