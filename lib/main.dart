@@ -1,6 +1,6 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:device_preview/device_preview.dart';
 import 'core/theme/app_theme.dart';
 import 'features/splash/presentation/screens/splash_screen.dart';
 import 'features/detail_paket/presentation/screens/detail_pesanan_page.dart';
@@ -9,12 +9,15 @@ import 'paket/detail_paket_mingguan_page.dart';
 import 'screens/rating_page.dart';
 import 'pesanan_data.dart';
 
+
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
+
   SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown,
   ]);
+
   SystemChrome.setSystemUIOverlayStyle(
     const SystemUiOverlayStyle(
       statusBarColor: Colors.transparent,
@@ -22,8 +25,15 @@ void main() {
       statusBarBrightness: Brightness.light,
     ),
   );
-  runApp(const MyummyApp());
+
+  runApp(
+    DevicePreview(
+      enabled: true,
+      builder: (context) => const MyummyApp(),
+    ),
+  );
 }
+
 
 const Color primaryBlue = Color(0xFF1748D8);
 const Color lightBlue = Color(0xFF7898D1);
@@ -34,7 +44,11 @@ class MyummyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
 return MaterialApp(
+  useInheritedMediaQuery: true,
+  locale: DevicePreview.locale(context),
+  builder: DevicePreview.appBuilder,
   debugShowCheckedModeBanner: false,
   title: 'myummy',
   theme: AppTheme.lightTheme,
@@ -44,6 +58,7 @@ return MaterialApp(
         const HomePage(initialTab: 2),
   },
 );
+
   }
 }
 
@@ -875,7 +890,6 @@ Widget _buildPesananPage() {
 
                 const Divider(height: 28),
 
-                // JADWAL PENGANTARAN
                 const Text(
                   'Jadwal Pengantaran',
                   style: TextStyle(
@@ -956,7 +970,6 @@ Widget _buildPesananPage() {
 
                 const SizedBox(height: 8),
 
-                // MENU TAMBAHAN
                 const Text(
                   'Menu Tambahan',
                   style: TextStyle(
@@ -1008,8 +1021,6 @@ Widget _buildPesananPage() {
                   }),
 
                 const Divider(height: 24),
-
-                // TOTAL PEMBAYARAN
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -1035,8 +1046,6 @@ Widget _buildPesananPage() {
                 ),
 
                 const SizedBox(height: 18),
-
-                // TOMBOL RATING DAN ULASAN
                 SizedBox(
                   width: double.infinity,
                   height: 45,
@@ -1078,7 +1087,6 @@ Widget _buildPesananPage() {
     ),
   );
 }
-
 
   Widget _buildProfilePage() {
     return SafeArea(

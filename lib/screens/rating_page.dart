@@ -86,7 +86,6 @@ class _RatingPageState extends State<RatingPage> {
               const SizedBox(height: 15),
               Divider(color: Colors.grey.shade300),
 
-              // INFORMASI PAKET
               Row(
                 children: [
                   Container(
@@ -152,7 +151,6 @@ class _RatingPageState extends State<RatingPage> {
               const SizedBox(height: 18),
               Divider(color: Colors.grey.shade300),
 
-              // RATING BINTANG
               const Text(
                 'Beri Rating',
                 style: TextStyle(
@@ -181,7 +179,6 @@ class _RatingPageState extends State<RatingPage> {
 
               const SizedBox(height: 20),
 
-              // KATEGORI PENGALAMAN
               const Text(
                 'Bagaimana pengalamanmu?',
                 style: TextStyle(
@@ -253,8 +250,6 @@ class _RatingPageState extends State<RatingPage> {
               TextField(
                 controller: reviewController,
                 maxLines: 4,
-
-                // PERBAIKAN WARNA TEKS YANG DIKETIK
                 style: const TextStyle(
                   color: Colors.black87,
                   fontSize: 13,
@@ -294,7 +289,6 @@ class _RatingPageState extends State<RatingPage> {
 
               const SizedBox(height: 14),
 
-              // TOMBOL KIRIM ULASAN
               SizedBox(
                 width: double.infinity,
                 height: 48,
