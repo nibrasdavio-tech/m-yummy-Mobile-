@@ -13,7 +13,6 @@ class PesananTambahanPage extends StatefulWidget {
 class _PesananTambahanPageState extends State<PesananTambahanPage> {
   static const blue = Color(0xFF2449D8);
 
-  // Harga dasar paket mingguan
   static const int hargaPaketMingguan = 250000;
 
   String hariAktif = 'Senin';
@@ -77,6 +76,7 @@ class _PesananTambahanPageState extends State<PesananTambahanPage> {
     return hargaPaketMingguan + totalTambahan;
   }
 
+  // Menghitung total porsi tambahan
   int get totalPorsi {
     return tambahan.values.fold(
       0,
@@ -103,6 +103,7 @@ class _PesananTambahanPageState extends State<PesananTambahanPage> {
         .toList();
   }
 
+  // Format rupiah
   String formatRupiah(int nominal) {
     return 'Rp${nominal.toString().replaceAllMapped(
       RegExp(r'\B(?=(\d{3})+(?!\d))'),
@@ -110,12 +111,14 @@ class _PesananTambahanPageState extends State<PesananTambahanPage> {
     )}';
   }
 
+  // Menambah porsi
   void tambahPorsi(String nama) {
     setState(() {
       tambahan[nama] = (tambahan[nama] ?? 0) + 1;
     });
   }
 
+  // Mengurangi porsi
   void kurangiPorsi(String nama) {
     setState(() {
       final jumlah = tambahan[nama] ?? 0;
@@ -128,6 +131,7 @@ class _PesananTambahanPageState extends State<PesananTambahanPage> {
     });
   }
 
+  // Memilih hari pengantaran
   Widget pilihanHari() {
     return Row(
       children: hariList.map((hari) {
@@ -168,6 +172,7 @@ class _PesananTambahanPageState extends State<PesananTambahanPage> {
     );
   }
 
+  // Kartu setiap menu tambahan
   Widget kartuMenu(Map<String, dynamic> item) {
     final nama = item['nama'] as String;
     final gambar = item['gambar'] as String;
@@ -251,6 +256,22 @@ class _PesananTambahanPageState extends State<PesananTambahanPage> {
     );
   }
 
+  // Navigasi menuju halaman pembayaran
+  void bukaHalamanPembayaran() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => Pembayaran(
+          totalPembayaran: totalPembayaran,
+          hariPengantaran: hariAktif,
+          waktuPengantaran: waktu,
+          menuTambahan: daftarTambahanTerpilih,
+        ),
+      ),
+    );
+  }
+
+  // Konfirmasi pesanan sebelum masuk pembayaran
   void konfirmasiPesanan() {
     // Jika tidak memilih menu tambahan
     if (totalPorsi == 0) {
@@ -268,18 +289,7 @@ class _PesananTambahanPageState extends State<PesananTambahanPage> {
               TextButton(
                 onPressed: () {
                   Navigator.pop(dialogContext);
-
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => Pembayaran(
-                        totalPembayaran: totalPembayaran,
-                        hariPengantaran: hariAktif,
-                        waktuPengantaran: waktu,
-                        menuTambahan: daftarTambahanTerpilih,
-                      ),
-                    ),
-                  );
+                  bukaHalamanPembayaran();
                 },
                 child: const Text('OK'),
               ),
@@ -305,6 +315,7 @@ class _PesananTambahanPageState extends State<PesananTambahanPage> {
         })
         .join('\n');
 
+    // Dialog konfirmasi pesanan
     showDialog(
       context: context,
       builder: (dialogContext) {
@@ -323,18 +334,7 @@ class _PesananTambahanPageState extends State<PesananTambahanPage> {
             TextButton(
               onPressed: () {
                 Navigator.pop(dialogContext);
-
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => Pembayaran(
-                      totalPembayaran: totalPembayaran,
-                      hariPengantaran: hariAktif,
-                      waktuPengantaran: waktu,
-                      menuTambahan: daftarTambahanTerpilih,
-                    ),
-                  ),
-                );
+                bukaHalamanPembayaran();
               },
               child: const Text('OK'),
             ),
@@ -384,10 +384,11 @@ class _PesananTambahanPageState extends State<PesananTambahanPage> {
 
                 const SizedBox(height: 16),
 
+                // Daftar menu tambahan
                 ...menuTambahan.map(kartuMenu),
 
-                // BAGIAN JADWAL HANYA MUNCUL
-                // JIKA PENGGUNA MEMILIH MENU TAMBAHAN
+                // Bagian jadwal hanya muncul
+                // jika pengguna memilih menu tambahan
                 if (totalPorsi > 0) ...[
                   const SizedBox(height: 15),
 
@@ -448,7 +449,7 @@ class _PesananTambahanPageState extends State<PesananTambahanPage> {
                   const SizedBox(height: 18),
                 ],
 
-                // JUMLAH PORSI
+                // Jumlah porsi
                 const Text(
                   'Jumlah Porsi',
                   style: TextStyle(
@@ -487,7 +488,7 @@ class _PesananTambahanPageState extends State<PesananTambahanPage> {
 
                 const SizedBox(height: 18),
 
-                // TOTAL BIAYA TAMBAHAN
+                // Total biaya tambahan
                 Container(
                   padding: const EdgeInsets.all(14),
                   decoration: BoxDecoration(
@@ -520,6 +521,7 @@ class _PesananTambahanPageState extends State<PesananTambahanPage> {
             ),
           ),
 
+          // Tombol lanjutkan pesanan
           Padding(
             padding: const EdgeInsets.all(16),
             child: SizedBox(
